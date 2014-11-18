@@ -22,6 +22,10 @@ class Board
     @pieces[enemy_color].any? { |piece| piece.moves.include?(our_king_pos) }
   end
 
+  def checkmate?(color)
+    in_check?(color) && @pieces[color].all?{ |piece| piece.valid_moves.empty? }
+  end
+
   def inspect
     @grid
   end

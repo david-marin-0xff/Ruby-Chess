@@ -8,3 +8,8 @@ require_relative 'rook'
 require_relative 'bishop'
 require_relative 'knight'
 require_relative 'pawn'
+
+class Game
+  def initialize(board)
+  end
+end
