@@ -10,6 +10,10 @@ class Piece
     @color = color
   end
 
+  def inspect
+    "#{pos} #{color}"
+  end
+
   def moves
     "moves"
   end
