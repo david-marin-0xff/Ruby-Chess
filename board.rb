@@ -3,15 +3,27 @@
 class Board
   def initialize
     @grid = Array.new(8) { Array.new(8) }
-    @white_pieces = []
-    @black_pieces = []
+    @pieces = {:white => [], :black => []}
     setup_pieces
   end
 
   def in_check?(color)
   end
 
+  def inspect
+    @pieces
+  end
+
   def move(start_pos,end_pos)
+    raise if self[start_pos].nil?
+
+    unless self[end_pos].nil?
+      color = self[end_pos].color
+      @pieces[color].delete(self[end_pos])
+    end
+
+    self[end_pos] = self[start_pos]
+    self[start_pos] = nil
   end
 
   def dup
@@ -22,9 +34,8 @@ class Board
   end
 
   def []=(pos,piece)
-    @grid[piece.pos] = nil unless piece.pos.nil?
     @grid[pos.first][pos.last] = piece
-    piece.pos = pos
+    piece.pos = pos unless piece.nil?
   end
 
   def display
@@ -45,15 +56,15 @@ class Board
 
   def setup_pieces
     @grid[1] = Array.new(8) { Pawn.new(self, :black) }
-    @grid[1].each { |pawn| @black_pieces << pawn }
+    @grid[1].each { |pawn| @pieces[:black] << pawn }
 
     @grid[6] = Array.new(8) { Pawn.new(self, :white) }
-    @grid[6].each { |pawn| @white_pieces << pawn }
+    @grid[6].each { |pawn| @pieces[:white] << pawn }
 
     setup_nonpawn(@grid[0], :black)
-    @grid[0].each { |nonpawn| @black_pieces << nonpawn }
+    @grid[0].each { |nonpawn| @pieces[:black] << nonpawn }
     setup_nonpawn(@grid[7], :white)
-    @grid[7].each { |nonpawn| @white_pieces << nonpawn }
+    @grid[7].each { |nonpawn| @pieces[:white] << nonpawn }
   end
 
   def setup_nonpawn(row, color)
