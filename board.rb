@@ -24,4 +24,18 @@ class Board
     @grid[pos.first][pos.last] = piece
     piece.pos = pos
   end
+
+  def display
+    @grid.each do |row|
+      row.each do |space|
+        if space.nil?
+          print "_ "
+        else
+          print space.render + " "
+        end
+      end
+      puts
+    end
+  end
+
 end

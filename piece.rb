@@ -16,4 +16,7 @@ class Piece
 
   def valid_moves
   end
+
+  def render
+  end
 end
