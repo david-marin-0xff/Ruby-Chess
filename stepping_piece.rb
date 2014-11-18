@@ -1,4 +1,4 @@
-require_relative 'Piece'
+#require_relative 'Piece'
 
-class SteppingPiece
+class SteppingPiece < Piece
 end

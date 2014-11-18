@@ -1,4 +1,4 @@
-require_relative 'Piece'
+#require_relative 'Piece'
 
-class Pawn
+class Pawn < Piece
 end

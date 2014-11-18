@@ -1,4 +1,4 @@
-require_relative 'SlidingPiece'
+#require_relative 'SlidingPiece'
 
-class Rook
+class Rook < SlidingPiece
 end

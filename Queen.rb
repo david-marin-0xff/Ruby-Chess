@@ -1,4 +1,5 @@
-require_relative 'SlidingPiece'
+#require_relative 'SlidingPiece'
 
-class Queen
+class Queen < SlidingPiece
+
 end
