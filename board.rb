@@ -1,9 +1,7 @@
 #require_relative 'Piece'
 
 class Board
-  def initialize(grid = nil, pieces = {:white => [], :black => [] })
-    @pieces = pieces
-
+  def initialize(grid = nil)
     if grid.nil?
       @grid = Array.new(8) { Array.new(8) }
       setup_pieces
@@ -12,18 +10,30 @@ class Board
     end
   end
 
+  def pieces(color)
+    @grid.flatten.compact.select do |piece|
+      piece.color == color
+    end
+  end
+
   def in_check?(color)
     enemy_color = color == :black ? :white : :black
 
-    our_king_idx = @pieces[color].index { |piece| piece.is_a?(King) }
+    our_king = pieces(color).select do |piece|
+      piece.is_a?(King)
+    end
 
-    our_king_pos = @pieces[color][our_king_idx].pos
+    our_king_pos = our_king[0].pos
 
-    @pieces[enemy_color].any? { |piece| piece.moves.include?(our_king_pos) }
+    pieces(enemy_color).any? do |piece|
+      piece.moves.include?(our_king_pos)
+    end
   end
 
   def checkmate?(color)
-    in_check?(color) && @pieces[color].all?{ |piece| piece.valid_moves.empty? }
+    in_check?(color) && pieces(color).all? do |piece|
+      piece.valid_moves.empty?
+    end
   end
 
   def inspect
@@ -32,8 +42,9 @@ class Board
 
   def move(start_pos,end_pos, color)
     raise "no piece @ start_pos" if self[start_pos].nil?
-    raise "invalid move" unless self[start_pos].valid_moves.include?(end_pos) &&
-                    self[start_pos].color == color
+    raise "invalid move" unless self[start_pos]
+          .valid_moves.include?(end_pos) &&
+          self[start_pos].color == color
 
     self.move!(start_pos, end_pos)
   end
@@ -43,7 +54,6 @@ class Board
 
     unless self[end_pos].nil?
       color = self[end_pos].color
-      @pieces[color].delete(self[end_pos])
     end
 
     self[end_pos] = self[start_pos]
@@ -52,27 +62,16 @@ class Board
 
   def dup
     grid_copy = Array.new(8) {Array.new(8)}
-    pieces_copy = {:black => [], :white => []}
+    board_copy = Board.new(grid_copy)
 
     grid_copy.each_index do |row|
       grid_copy[row].each_index do |col|
         next if @grid[row][col].nil?
         piece = @grid[row][col]
-        grid_copy[row][col] = piece.class.new(nil,piece.color)
-        grid_copy[row][col].pos = [row,col]
-        pieces_copy[piece.color] << grid_copy[row][col]
+        board_copy[[row,col]] = piece.class.new(board_copy, piece.color)
       end
     end
 
-    board_copy = Board.new(grid_copy, pieces_copy)
-
-    pieces_copy[:black].each do |piece|
-      piece.board = board_copy
-    end
-
-    pieces_copy[:white].each do |piece|
-      piece.board = board_copy
-    end
     board_copy
   end
 
@@ -111,23 +110,16 @@ class Board
 
     (0..7).each do |i|
       self[[1, i]] = Pawn.new(self, :black)
-      @pieces[:black] << self[[1,i]]
-      @pieces[:black] << self[[0,i]]
       self[[6, i]] = Pawn.new(self, :white)
-      @pieces[:white] << self[[6,i]]
-      @pieces[:white] << self[[7,i]]
     end
   end
 
   def setup_nonpawn(row, color)
-    self[[row,0]] = Rook.new(self, color)
-    self[[row,1]] = Knight.new(self, color)
-    self[[row,2]] = Bishop.new(self, color)
-    self[[row,3]] = Queen.new(self, color)
-    self[[row,4]] = King.new(self, color)
-    self[[row,5]] = Bishop.new(self, color)
-    self[[row,6]] = Knight.new(self, color)
-    self[[row,7]] = Rook.new(self, color)
+    nonpawn_row = [Rook, Knight, Bishop,
+      Queen, King, Bishop, Knight, Rook]
+    nonpawn_row.each_with_index do |piece_class, i|
+      self[[row, i]] = piece_class.new(self, color)
+    end
   end
 
 end
