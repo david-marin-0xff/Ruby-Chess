@@ -2,59 +2,31 @@
 
 class SlidingPiece < Piece
 
-  def moves
-  end
+  DELTAS = {
+    :diagonals      => [[1,1], [-1,-1], [1,-1], [-1,1]],
+    :straightlines  => [[1,0], [-1,0], [0,1], [0,-1]]
+  }
 
-  def diag_moves
-  end
-
-  def line_moves
+  def moves(deltas)
     moves = []
-    (@pos.first+1...8).each do |x|
-      new_pos = [x, @pos.last]
+    deltas.each do |delta|
+      new_pos = [@pos.first + delta.first, @pos.last + delta.last]
 
-      if @board[new_pos].nil?
-        moves << new_pos
-      else
-        moves << new_pos if @board[new_pos].color != @color
-        break
+      while new_pos.first.between?(0,7) && new_pos.last.between?(0,7)
+        if @board[new_pos].nil?
+          moves << new_pos
+        else
+          moves << new_pos if @board[new_pos].color != @color
+          break
+        end
+
+        new_pos = [new_pos.first + delta.first, new_pos.last + delta.last]
       end
-    end
 
-    (@pos.first-1).downto(0).each do |x|
-      new_pos = [x, @pos.last]
-
-      if @board[new_pos].nil?
-        moves << new_pos
-      else
-        moves << new_pos if @board[new_pos].color != @color
-        break
-      end
-    end
-
-    (@pos.last+1...8).each do |x|
-      new_pos = [@pos.first, x]
-
-      if @board[new_pos].nil?
-        moves << new_pos
-      else
-        moves << new_pos if @board[new_pos].color != @color
-        break
-      end
-    end
-
-    (@pos.last-1).downto(0) do |x|
-      new_pos = [@pos.first, x]
-
-      if @board[new_pos].nil?
-        moves << new_pos
-      else
-        moves << new_pos if @board[new_pos].color != @color
-        break
-      end
     end
 
     moves
   end
+
 
 end

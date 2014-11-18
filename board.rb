@@ -20,7 +20,8 @@ class Board
     @grid[pos.first][pos.last]
   end
 
-  def put_piece(piece)
-    self[pos] = piece
+  def []=(pos,piece)
+    @grid[pos.first][pos.last] = piece
+    piece.pos = pos
   end
 end
