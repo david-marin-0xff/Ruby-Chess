@@ -13,14 +13,15 @@ class Pawn < Piece
     moves = []
     direction = @color == :black ? 1 : -1
 
-    if @first_move
+    new_pos = [pos.first + direction, pos.last]
+    moves << new_pos if @board[new_pos].nil? && new_pos.first.between?(0,7)
+
+    if @board[new_pos].nil? && @first_move
       new_pos = [pos.first+2*direction,pos.last]
       moves << new_pos if @board[new_pos].nil?
     end
 
-    new_pos = [pos.first + direction, pos.last]
-    moves << new_pos if @board[new_pos].nil? && new_pos.first.between?(0,7)
-
+    # captures
     new_pos = [pos.first + direction, pos.last + 1]
     moves << new_pos if !@board[new_pos].nil? && @board[new_pos].color != color
 

@@ -1,10 +1,15 @@
 #require_relative 'Piece'
 
 class Board
-  def initialize
-    @grid = Array.new(8) { Array.new(8) }
-    @pieces = { :white => [], :black => [] }
-    setup_pieces
+  def initialize(grid = nil, pieces = {:white => [], :black => [] })
+    @pieces = pieces
+
+    if grid.nil?
+      @grid = Array.new(8) { Array.new(8) }
+      setup_pieces
+    else
+      @grid = grid
+    end
   end
 
   def in_check?(color)
@@ -18,11 +23,12 @@ class Board
   end
 
   def inspect
-    @pieces
+    @grid
   end
 
   def move(start_pos,end_pos)
     raise if self[start_pos].nil?
+    raise unless self[start_pos].moves.include?(end_pos)
 
     unless self[end_pos].nil?
       color = self[end_pos].color
@@ -34,6 +40,12 @@ class Board
   end
 
   def dup
+    grid_copy = @grid.dd_map
+    pieces_copy = {:black => @pieces[:black].dup, :white => @pieces[:white].dup}
+    board_copy = Board.new(grid_copy, pieces_copy)
+    pieces_copy[:black].each { |piece| piece.board = board_copy }
+    pieces_copy[:white].each { |piece| piece.board = board_copy }
+    board_copy
   end
 
   def [](pos)

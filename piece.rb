@@ -2,7 +2,7 @@
 
 class Piece
   attr_reader :color
-  attr_accessor :pos
+  attr_accessor :pos, :board
 
   def initialize(board,color)
     @pos = nil
@@ -19,6 +19,7 @@ class Piece
   end
 
   def valid_moves
+    
   end
 
   def render
