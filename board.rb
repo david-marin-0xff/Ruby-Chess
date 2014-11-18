@@ -19,7 +19,7 @@ class Board
 
     our_king_pos = @pieces[color][our_king_idx].pos
 
-    @pieces[enemy_color].any? { |piece| p piece.moves; piece.moves.include?(our_king_pos) }
+    @pieces[enemy_color].any? { |piece| piece.moves.include?(our_king_pos) }
   end
 
   def inspect
@@ -27,8 +27,14 @@ class Board
   end
 
   def move(start_pos,end_pos)
-    raise if self[start_pos].nil?
-    raise unless self[start_pos].moves.include?(end_pos)
+    raise "no piece @ start_pos" if self[start_pos].nil?
+    raise "invalid move" unless self[start_pos].valid_moves.include?(end_pos)
+
+    self.move!(start_pos, end_pos)
+  end
+
+  def move!(start_pos, end_pos)
+    raise "no piece @ start_pos" if self[start_pos].nil?
 
     unless self[end_pos].nil?
       color = self[end_pos].color
@@ -40,11 +46,28 @@ class Board
   end
 
   def dup
-    grid_copy = @grid.dd_map
-    pieces_copy = {:black => @pieces[:black].dup, :white => @pieces[:white].dup}
+    grid_copy = Array.new(8) {Array.new(8)}
+    pieces_copy = {:black => [], :white => []}
+
+    grid_copy.each_index do |row|
+      grid_copy[row].each_index do |col|
+        next if @grid[row][col].nil?
+        piece = @grid[row][col]
+        grid_copy[row][col] = piece.class.new(nil,piece.color)
+        grid_copy[row][col].pos = [row,col]
+        pieces_copy[piece.color] << grid_copy[row][col]
+      end
+    end
+
     board_copy = Board.new(grid_copy, pieces_copy)
-    pieces_copy[:black].each { |piece| piece.board = board_copy }
-    pieces_copy[:white].each { |piece| piece.board = board_copy }
+
+    pieces_copy[:black].each do |piece|
+      piece.board = board_copy
+    end
+
+    pieces_copy[:white].each do |piece|
+      piece.board = board_copy
+    end
     board_copy
   end
 
