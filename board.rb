@@ -21,6 +21,7 @@ class Board
   end
 
   def []=(pos,piece)
+    @grid[piece.pos] = nil unless piece.pos.nil?
     @grid[pos.first][pos.last] = piece
     piece.pos = pos
   end
