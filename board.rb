@@ -37,6 +37,7 @@ class Board
       end
       puts
     end
+    nil
   end
 
 end
