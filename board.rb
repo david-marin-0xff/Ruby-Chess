@@ -30,9 +30,10 @@ class Board
     @grid
   end
 
-  def move(start_pos,end_pos)
+  def move(start_pos,end_pos, color)
     raise "no piece @ start_pos" if self[start_pos].nil?
-    raise "invalid move" unless self[start_pos].valid_moves.include?(end_pos)
+    raise "invalid move" unless self[start_pos].valid_moves.include?(end_pos) &&
+                    self[start_pos].color == color
 
     self.move!(start_pos, end_pos)
   end
@@ -85,7 +86,9 @@ class Board
   end
 
   def display
-    @grid.each do |row|
+    puts "  A B C D E F G H"
+    @grid.each_with_index do |row, idx|
+      print "#{8 - idx} "
       row.each do |space|
         if space.nil?
           print "_ "
@@ -93,8 +96,10 @@ class Board
           print space.render + " "
         end
       end
+      print "#{8 - idx} "
       puts
     end
+    puts "  A B C D E F G H"
     nil
   end
 
