@@ -99,20 +99,26 @@ class Board
   end
 
   def display
-    puts "  A B C D E F G H"
+    puts "    A  B  C  D  E  F  G  H    ".colorize(:background => :light_white)
+
+    color = :default
+
     @grid.each_with_index do |row, idx|
-      print "#{8 - idx} "
+      print " #{8 - idx} ".colorize(:background => :light_white)
+
       row.each do |space|
         if space.nil?
-          print "_ "
+          print "   ".colorize(:background => color)
         else
-          print space.render + " "
+          print " #{space.render} ".colorize(:background => color)
         end
+        color = color == :default ? :white : :default
       end
-      print "#{8 - idx} "
+      color = color == :default ? :white : :default
+      print " #{8 - idx} ".colorize(:background => :light_white)
       puts
     end
-    puts "  A B C D E F G H"
+    puts "    A  B  C  D  E  F  G  H    ".colorize(:background => :light_white)
     nil
   end
 

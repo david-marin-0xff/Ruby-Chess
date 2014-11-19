@@ -8,6 +8,7 @@ require_relative 'rook'
 require_relative 'bishop'
 require_relative 'knight'
 require_relative 'pawn'
+require          'colorize'
 
 PROMOTIONS = {"queen" => Queen,
           "rook" => Rook,
@@ -41,7 +42,7 @@ class Game
     end
 
     @board.display
-    
+
     if @board.checkmate?(turn)
       winner = turn == :white ? :black : :white
       puts "Checkmate! The winner is #{winner}."
