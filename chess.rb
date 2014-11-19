@@ -26,13 +26,13 @@ class Game
     turn = :white
 
     until @board.checkmate?(turn) || @board.stalemate?(turn)
-      @board.display
+      @board.display(:white, :default, :light_white)
 
       begin
         @players[turn].play_turn(@board,turn)
       rescue MyChessError => e
         puts "#{e.message}"
-        @board.display
+        @board.display(:white, :default, :light_white)
         retry
       end
 
@@ -41,7 +41,7 @@ class Game
       puts "Check!" if @board.in_check?(turn)
     end
 
-    @board.display
+    @board.display(:white, :default, :light_white)
 
     if @board.checkmate?(turn)
       winner = turn == :white ? :black : :white
@@ -77,7 +77,7 @@ class HumanPlayer
         board.promote_pawn(piece, color)
       rescue MyChessError => e
         puts "#{e.message}"
-        board.display
+        board.display(:white, :default, :light_white)
         retry
       end
     end
