@@ -182,6 +182,9 @@ if __FILE__ == $PROGRAM_NAME
     g = Game.new(HumanPlayer.new, HumanPlayer.new)
     g.play
   else
+    fname = ARGV.shift
+    g = YAML::load(File.read(fname))
+    g.play
   end
 
 end
