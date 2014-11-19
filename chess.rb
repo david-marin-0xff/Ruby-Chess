@@ -9,6 +9,11 @@ require_relative 'bishop'
 require_relative 'knight'
 require_relative 'pawn'
 
+PROMOTIONS = {"queen" => Queen,
+          "rook" => Rook,
+          "bishop" => Bishop,
+          "knight" => Knight}
+
 class Game
   def initialize(player1, player2)
     @board = Board.new
@@ -19,7 +24,7 @@ class Game
 
     turn = :white
 
-    until @board.checkmate?(:white) || @board.checkmate?(:black)
+    until @board.checkmate?(turn) || @board.stalemate?(turn)
       @board.display
 
       begin
@@ -31,6 +36,17 @@ class Game
       end
 
       turn = turn == :white ? :black : :white
+
+      puts "Check!" if @board.in_check?(turn)
+    end
+
+    @board.display
+    
+    if @board.checkmate?(turn)
+      winner = turn == :white ? :black : :white
+      puts "Checkmate! The winner is #{winner}."
+    else
+      puts "The game is a draw."
     end
   end
 
@@ -49,7 +65,21 @@ class HumanPlayer
 
     move = HumanPlayer.translate_coords(coords)
     board.move(move[0],move[1],color)
+    check_promotion(board, color)
+  end
 
+  def check_promotion(board, color)
+    if board.pawn_promotion
+      begin
+        puts "What piece would you like to promote to?"
+        piece = gets.chomp.downcase
+        board.promote_pawn(piece, color)
+      rescue MyChessError => e
+        puts "#{e.message}"
+        board.display
+        retry
+      end
+    end
   end
 
   def self.translate_coords(coords)

@@ -10,7 +10,7 @@ class Board
     end
   end
 
-  attr_accessor :en_passant
+  attr_accessor :en_passant, :pawn_promotion
 
   def pieces(color)
     @grid.flatten.compact.select do |piece|
@@ -35,6 +35,12 @@ class Board
 
   def checkmate?(color)
     in_check?(color) && pieces(color).all? do |piece|
+      piece.valid_moves.empty?
+    end
+  end
+
+  def stalemate?(color)
+    !in_check?(color) && pieces(color).all? do |piece|
       piece.valid_moves.empty?
     end
   end
@@ -110,6 +116,12 @@ class Board
     nil
   end
 
+  def promote_pawn(piece, color)
+    raise "Bad piece" unless PROMOTIONS.has_key?(piece)
+    self[@pawn_promotion] = PROMOTIONS[piece].new(self, color)
+    @pawn_promotion = nil
+  end
+
   private
 
   def setup_pieces
@@ -158,6 +170,7 @@ class Board
         @en_passant = nil
       else
         @en_passant = nil
+        @pawn_promotion = end_pos if end_pos.first == 0 || end_pos.first == 7
       end
     else
       @en_passant = nil
