@@ -1,4 +1,10 @@
 class Board
+  COLORS = {
+    :light => :default,
+    :dark => :white,
+    :border => :light_white,
+    :highlight => :light_red
+  }
 
   attr_accessor :en_passant, :pawn_promotion
 
@@ -12,19 +18,13 @@ class Board
   end
 
   def pieces(color)
-    @grid.flatten.compact.select do |piece|
-      piece.color == color
-    end
+    @grid.flatten.compact.select { |piece| piece.color == color }
   end
 
   def in_check?(color)
     enemy_color = color == :black ? :white : :black
 
-    our_king = pieces(color).select do |piece|
-      piece.is_a?(King)
-    end
-
-    our_king_pos = our_king[0].pos
+    our_king_pos = pieces(color).select { |piece| piece.is_a?(King) }[0].pos
 
     pieces(enemy_color).any? do |piece|
       next if piece.is_a?(King)
@@ -33,9 +33,7 @@ class Board
   end
 
   def checkmate?(color)
-    in_check?(color) && pieces(color).all? do |piece|
-      piece.valid_moves.empty?
-    end
+    in_check?(color) && pieces(color).all? { |piece| piece.valid_moves.empty? }
   end
 
   def stalemate?(color)
@@ -49,24 +47,15 @@ class Board
   end
 
   def move(start_pos,end_pos, color)
-    raise MyChessError.new("No piece @ start position!") if self[start_pos].nil?
-    raise MyChessError.new("Piece can't move there!") unless self[start_pos]
-          .moves.include?(end_pos)
-    raise MyChessError.new("Causes check!") unless self[start_pos]
-          .valid_moves.include?(end_pos)
-    raise MyChessError.new("Wrong turn!") unless self[start_pos].color == color
+    validate_move(start_pos,end_pos, color)
 
     self.move!(start_pos, end_pos)
   end
 
   def move!(start_pos, end_pos)
-    raise MyChessError.new("No piece @ start position!") if self[start_pos].nil?
-
     self[start_pos].first_move = false if self[start_pos].is_a?(Rook)
 
-    # King / Castling Stuff
     check_king(start_pos, end_pos)
-    # Pawn Logic
     check_pawn(start_pos, end_pos)
 
     self[end_pos] = self[start_pos]
@@ -97,7 +86,11 @@ class Board
     piece.pos = pos unless piece.nil?
   end
 
-  def display(bg1, bg2, border, move = [])
+  def display(move = [])
+    bg1 = COLORS[:dark]
+    bg2 = COLORS[:light]
+    border = COLORS[:border]
+
     top_bot_border = "    A  B  C  D  E  F  G  H    "
                      .colorize(:background => border)
     puts top_bot_border
@@ -108,7 +101,7 @@ class Board
       print " #{8 - idx} ".colorize(:background => border)
 
       row.each_with_index do |space, space_idx|
-        back = move.include?([idx, space_idx]) ? :light_red : color
+        back = move.include?([idx, space_idx]) ? COLORS[:highlight] : color
 
         if space.nil?
           print "   ".colorize(:background => back)
@@ -132,6 +125,15 @@ class Board
   end
 
   private
+
+  def validate_move(start_pos, end_pos, color)
+    raise MyChessError.new("No piece @ start position!") if self[start_pos].nil?
+    raise MyChessError.new("Piece can't move there!") unless self[start_pos]
+          .moves.include?(end_pos)
+    raise MyChessError.new("Causes check!") unless self[start_pos]
+          .valid_moves.include?(end_pos)
+    raise MyChessError.new("Wrong turn!") unless self[start_pos].color == color
+  end
 
   def setup_pieces
     setup_nonpawn(0, :black)
@@ -170,6 +172,7 @@ class Board
   def check_pawn(start_pos, end_pos)
     if self[start_pos].is_a?(Pawn)
       self[start_pos].first_move = false
+
       if (start_pos.first - end_pos.first).abs == 2
         direction = (end_pos.first - start_pos.first) / 2
         @en_passant = [start_pos.first + direction, end_pos.last]
@@ -181,6 +184,7 @@ class Board
         @en_passant = nil
         @pawn_promotion = end_pos if end_pos.first == 0 || end_pos.first == 7
       end
+      
     else
       @en_passant = nil
     end

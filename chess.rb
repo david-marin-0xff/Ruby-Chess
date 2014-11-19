@@ -29,44 +29,18 @@ class Game
 
     system "clear" or system "cls"
     puts
-    @board.display(:white, :default, :light_white)
+    @board.display
 
     until @board.checkmate?(@turn) || @board.stalemate?(@turn)
-
-      begin
-        move = @players[@turn].play_turn(@board,@turn)
-        if move == "save"
-          puts "Please enter filename:"
-          fname = gets.chomp
-          File.open(fname, 'w') do |f|
-            f.puts self.to_yaml
-          end
-          puts "Game saved to file: \"#{fname}\"."
-          return
-        end
-      rescue MyChessError => e
-        system "clear" or system "cls"
-        puts "#{e.message}"
-        @board.display(:white, :default, :light_white)
-        retry
-      end
-
-      locs = HumanPlayer.translate_coords(move.split(/\s+/))
+      move = do_move
       sleep(0.3)
-
-      system "clear" or system "cls"
-
-      @board.display(:white, :default, :light_white, locs)
-      puts "#{@turn.to_s.capitalize}\'s move was #{move.chop}."
+      show_move(move)
 
       @turn = (@turn == :white) ? :black : :white
-
       puts "Check!\a" if @board.in_check?(@turn)
-
-
     end
 
-    @board.display(:white, :default, :light_white)
+    @board.display
 
     if @board.checkmate?(@turn)
       winner = (@turn == :white) ? :black : :white
@@ -74,6 +48,40 @@ class Game
     elsif @board.stalemate?(@turn)
       puts "The game is a draw."
     end
+  end
+
+  private
+
+  def save_game
+    puts "Please enter filename:"
+    fname = gets.chomp
+    File.open(fname, 'w') do |f|
+      f.puts self.to_yaml
+    end
+    puts "Game saved to file: \"#{fname}\"."
+  end
+
+  def show_move(move)
+    locs = HumanPlayer.translate_coords(move.split(/\s+/))
+    system "clear" or system "cls"
+    @board.display(locs)
+    puts "#{@turn.to_s.capitalize}\'s move was #{move.chomp(' ')}."
+  end
+
+  def do_move
+    begin
+      move = @players[@turn].play_turn(@board,@turn)
+      if move == "save"
+        save_game
+        return
+      end
+    rescue MyChessError => e
+      system "clear" or system "cls"
+      puts "#{e.message}"
+      @board.display
+      retry
+    end
+    move
   end
 
 end
@@ -98,6 +106,18 @@ class HumanPlayer
     input
   end
 
+  def self.translate_coords(coords)
+    new_coords = []
+    coords.each do |coord|
+      new_coords_one = coord[0].downcase.bytes[0] - 97
+      new_coords_two = 8 - coord[1].to_i
+      new_coords << [new_coords_two, new_coords_one]
+    end
+    new_coords
+  end
+
+  private
+
   def check_promotion(board, color)
     if board.pawn_promotion
       begin
@@ -110,16 +130,6 @@ class HumanPlayer
         retry
       end
     end
-  end
-
-  def self.translate_coords(coords)
-    new_coords = []
-    coords.each do |coord|
-      new_coords_one = coord[0].downcase.bytes[0] - 97
-      new_coords_two = 8 - coord[1].to_i
-      new_coords << [new_coords_two, new_coords_one]
-    end
-    new_coords
   end
 end
 
@@ -164,13 +174,8 @@ class ComputerPlayer
 
 
     board.move(best_move[0],best_move[1],color)
-    ComputerPlayer.translate_coords(best_move)
     check_promotion(board, color)
-  end
-
-  def check_promotion(board, color)
-    if board.pawn_promotion
-    board.promote_pawn(Queen, color)
+    ComputerPlayer.translate_coords(best_move)
   end
 
   def self.translate_coords(coords)
@@ -181,6 +186,12 @@ class ComputerPlayer
       new_coords << new_coords_one << new_coords_two << " "
     end
     new_coords
+  end
+
+  private
+
+  def check_promotion(board, color)
+    board.promote_pawn(Queen, color) if board.pawn_promotion
   end
 
 end
