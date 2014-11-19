@@ -28,6 +28,7 @@ class Board
     our_king_pos = our_king[0].pos
 
     pieces(enemy_color).any? do |piece|
+      next if piece.is_a?(King)
       piece.moves.include?(our_king_pos)
     end
   end
@@ -44,16 +45,38 @@ class Board
 
   def move(start_pos,end_pos, color)
     raise MyChessError.new("no piece @ start_pos") if self[start_pos].nil?
-    raise MyChessError.new("invalid move") unless self[start_pos]
-          .valid_moves.include?(end_pos) &&
-          self[start_pos].color == color
+    raise MyChessError.new("Piece can't move there") unless self[start_pos]
+          .moves.include?(end_pos)
+    raise MyChessError.new("Causes check") unless self[start_pos]
+          .valid_moves.include?(end_pos)
+    raise MyChessError.new("Wrong Turn") unless self[start_pos].color == color
 
     self.move!(start_pos, end_pos)
   end
 
   def move!(start_pos, end_pos)
     raise MyChessError.new("no piece @ start_pos") if self[start_pos].nil?
+    start_piece = self[start_pos]
+    # King / Castling Stuff
+    if start_piece.is_a?(King)
+      start_piece.first_move = false
 
+      if (end_pos.last - start_pos.last) == 2
+        rook_pos = [start_pos.first, end_pos.last + 1]
+        rook_end_pos = [start_pos.first, rook_pos.last - 2]
+        #move!(rook_pos, rook_end_pos)
+        self[rook_end_pos] = self[rook_pos]
+        self[rook_pos] = nil
+      elsif (end_pos.last - start_pos.last) == -2
+        rook_pos = [start_pos.first, end_pos.last - 2]
+        rook_end_pos = [start_pos.first, rook_pos.last + 3]
+        #move!(rook_pos, rook_end_pos)
+        self[rook_end_pos] = self[rook_pos]
+        self[rook_pos] = nil
+      end
+    end
+
+    # Pawn Logic
     if self[start_pos].is_a?(Pawn)
       self[start_pos].first_move = false
       if (start_pos.first - end_pos.first).abs == 2

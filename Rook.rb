@@ -2,6 +2,13 @@
 
 class Rook < SlidingPiece
 
+  def initialize(board,color)
+    super(board,color)
+    @first_move = true
+  end
+
+  attr_accessor :first_move
+
   def moves
     super(DELTAS[:straightlines])
   end
