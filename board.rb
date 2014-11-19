@@ -56,42 +56,13 @@ class Board
 
   def move!(start_pos, end_pos)
     raise MyChessError.new("no piece @ start_pos") if self[start_pos].nil?
-    start_piece = self[start_pos]
+
+    self[start_pos].first_move = false if self[start_pos].is_a?(Rook)
+
     # King / Castling Stuff
-    if start_piece.is_a?(King)
-      start_piece.first_move = false
-
-      if (end_pos.last - start_pos.last) == 2
-        rook_pos = [start_pos.first, end_pos.last + 1]
-        rook_end_pos = [start_pos.first, rook_pos.last - 2]
-        #move!(rook_pos, rook_end_pos)
-        self[rook_end_pos] = self[rook_pos]
-        self[rook_pos] = nil
-      elsif (end_pos.last - start_pos.last) == -2
-        rook_pos = [start_pos.first, end_pos.last - 2]
-        rook_end_pos = [start_pos.first, rook_pos.last + 3]
-        #move!(rook_pos, rook_end_pos)
-        self[rook_end_pos] = self[rook_pos]
-        self[rook_pos] = nil
-      end
-    end
-
+    check_king(start_pos, end_pos)
     # Pawn Logic
-    if self[start_pos].is_a?(Pawn)
-      self[start_pos].first_move = false
-      if (start_pos.first - end_pos.first).abs == 2
-        direction = (end_pos.first - start_pos.first) / 2
-        @en_passant = [start_pos.first + direction, end_pos.last]
-        @en_passant_pawn = end_pos
-      elsif end_pos == @en_passant
-        self[@en_passant_pawn] = nil
-        @en_passant = nil
-      else
-        @en_passant = nil
-      end
-    else
-      @en_passant = nil
-    end
+    check_pawn(start_pos, end_pos)
 
     self[end_pos] = self[start_pos]
     self[start_pos] = nil
@@ -156,6 +127,40 @@ class Board
       Queen, King, Bishop, Knight, Rook]
     nonpawn_row.each_with_index do |piece_class, i|
       self[[row, i]] = piece_class.new(self, color)
+    end
+  end
+
+  def check_king(start_pos, end_pos)
+    if self[start_pos].is_a?(King)
+      self[start_pos].first_move = false
+
+      if (end_pos.last - start_pos.last) == 2
+        rook_pos = [start_pos.first, end_pos.last + 1]
+        rook_end_pos = [start_pos.first, rook_pos.last - 2]
+        move!(rook_pos, rook_end_pos)
+      elsif (end_pos.last - start_pos.last) == -2
+        rook_pos = [start_pos.first, end_pos.last - 2]
+        rook_end_pos = [start_pos.first, rook_pos.last + 3]
+        move!(rook_pos, rook_end_pos)
+      end
+    end
+  end
+
+  def check_pawn(start_pos, end_pos)
+    if self[start_pos].is_a?(Pawn)
+      self[start_pos].first_move = false
+      if (start_pos.first - end_pos.first).abs == 2
+        direction = (end_pos.first - start_pos.first) / 2
+        @en_passant = [start_pos.first + direction, end_pos.last]
+        @en_passant_pawn = end_pos
+      elsif end_pos == @en_passant
+        self[@en_passant_pawn] = nil
+        @en_passant = nil
+      else
+        @en_passant = nil
+      end
+    else
+      @en_passant = nil
     end
   end
 
