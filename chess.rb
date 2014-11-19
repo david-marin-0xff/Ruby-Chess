@@ -9,7 +9,7 @@ require_relative 'bishop'
 require_relative 'knight'
 require_relative 'pawn'
 require          'colorize'
-#require          'yaml'
+require          'yaml'
 
 PROMOTIONS = {
   "queen"  => Queen,
@@ -22,19 +22,28 @@ class Game
   def initialize(player1, player2)
     @board = Board.new
     @players = {:white => player1, :black => player2}
+    @turn = :white
   end
 
   def play
 
-    turn = :white
     system "clear" or system "cls"
     puts
 
-    until @board.checkmate?(turn) || @board.stalemate?(turn)
+    until @board.checkmate?(@turn) || @board.stalemate?(@turn)
       @board.display(:white, :default, :light_white)
 
       begin
-        move = @players[turn].play_turn(@board,turn)
+        move = @players[@turn].play_turn(@board,@turn)
+        if move == "save"
+          puts "Please enter filename:"
+          fname = gets.chomp
+          File.open(fname, 'w') do |f|
+            f.puts self.to_yaml
+          end
+          puts "Game saved to file: \"#{fname}\"."
+          return
+        end
       rescue MyChessError => e
         system "clear" or system "cls"
         puts "#{e.message}"
@@ -43,19 +52,19 @@ class Game
       end
 
       system "clear" or system "cls"
-      puts "#{turn.to_s.capitalize}\'s move was #{move.chop}."
+      puts "#{@turn.to_s.capitalize}\'s move was #{move.chop}."
 
-      turn = turn == :white ? :black : :white
+      @turn = (@turn == :white) ? :black : :white
 
-      puts "Check!" if @board.in_check?(turn)
+      puts "Check!" if @board.in_check?(@turn)
     end
 
     @board.display(:white, :default, :light_white)
 
-    if @board.checkmate?(turn)
-      winner = turn == :white ? :black : :white
+    if @board.checkmate?(@turn)
+      winner = (@turn == :white) ? :black : :white
       puts "Checkmate! The winner is #{winner}."
-    else
+    elsif @board.stalemate?(@turn)
       puts "The game is a draw."
     end
   end
@@ -67,6 +76,8 @@ class HumanPlayer
   def play_turn(board, color)
     puts "#{color.to_s.capitalize} to move.  Input your move."
     input = gets.chomp
+
+    return "save" if input.downcase == "save"
 
     coords = input.split(/\s+/)
 
