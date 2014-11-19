@@ -1,6 +1,7 @@
-#require_relative 'Piece'
-
 class Board
+
+  attr_accessor :en_passant, :pawn_promotion
+
   def initialize(grid = nil)
     if grid.nil?
       @grid = Array.new(8) { Array.new(8) }
@@ -9,8 +10,6 @@ class Board
       @grid = grid
     end
   end
-
-  attr_accessor :en_passant, :pawn_promotion
 
   def pieces(color)
     @grid.flatten.compact.select do |piece|
@@ -50,18 +49,18 @@ class Board
   end
 
   def move(start_pos,end_pos, color)
-    raise MyChessError.new("no piece @ start_pos") if self[start_pos].nil?
-    raise MyChessError.new("Piece can't move there") unless self[start_pos]
+    raise MyChessError.new("No piece @ start position!") if self[start_pos].nil?
+    raise MyChessError.new("Piece can't move there!") unless self[start_pos]
           .moves.include?(end_pos)
-    raise MyChessError.new("Causes check") unless self[start_pos]
+    raise MyChessError.new("Causes check!") unless self[start_pos]
           .valid_moves.include?(end_pos)
-    raise MyChessError.new("Wrong Turn") unless self[start_pos].color == color
+    raise MyChessError.new("Wrong turn!") unless self[start_pos].color == color
 
     self.move!(start_pos, end_pos)
   end
 
   def move!(start_pos, end_pos)
-    raise MyChessError.new("no piece @ start_pos") if self[start_pos].nil?
+    raise MyChessError.new("No piece @ start position!") if self[start_pos].nil?
 
     self[start_pos].first_move = false if self[start_pos].is_a?(Rook)
 
@@ -125,7 +124,7 @@ class Board
   end
 
   def promote_pawn(piece, color)
-    raise "Bad piece" unless PROMOTIONS.has_key?(piece)
+    raise MyChessError.new("Bad piece!") unless PROMOTIONS.has_key?(piece)
     self[@pawn_promotion] = PROMOTIONS[piece].new(self, color)
     @pawn_promotion = nil
   end

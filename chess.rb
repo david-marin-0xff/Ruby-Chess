@@ -10,10 +10,12 @@ require_relative 'knight'
 require_relative 'pawn'
 require          'colorize'
 
-PROMOTIONS = {"queen" => Queen,
-          "rook" => Rook,
-          "bishop" => Bishop,
-          "knight" => Knight}
+PROMOTIONS = {
+  "queen"  => Queen,
+  "rook"   => Rook,
+  "bishop" => Bishop,
+  "knight" => Knight
+}
 
 class Game
   def initialize(player1, player2)
@@ -61,7 +63,7 @@ class HumanPlayer
     coords = input.split(/\s+/)
 
     if coords.length != 2 || coords.any? { |coord| coord !~ /^[a-hA-H]{1}\d{1}$/ }
-      raise MyChessError.new("bad input!")
+      raise MyChessError.new("Bad input!")
     end
 
     move = HumanPlayer.translate_coords(coords)
@@ -95,9 +97,19 @@ class HumanPlayer
 end
 
 class ComputerPlayer
+
   def play_turn(board)
   end
+
 end
 
 class MyChessError < StandardError
+
+end
+
+if __FILE__ == $PROGRAM_NAME
+
+  g = Game.new(HumanPlayer.new, HumanPlayer.new)
+  g.play
+
 end

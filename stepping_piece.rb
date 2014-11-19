@@ -1,9 +1,8 @@
-#require_relative 'Piece'
-
 class SteppingPiece < Piece
 
   def moves(deltas)
     moves = []
+
     deltas.each do |delta|
       new_pos = [pos.first + delta.first, pos.last + delta.last]
 
@@ -13,6 +12,7 @@ class SteppingPiece < Piece
         moves << new_pos
       end
     end
+
     moves
   end
 

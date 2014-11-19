@@ -1,14 +1,14 @@
-#require_relative 'SteppingPiece'
-
 class King < SteppingPiece
-  DELTAS = [[0,1],[1,0],[0,-1],[-1,0],[1,1],[-1,-1],[1,-1],[-1,1]]
+
+  DELTAS = [[0,1],[1,0],[0,-1],[-1,0],
+            [1,1],[-1,-1],[1,-1],[-1,1]]
+
+  attr_accessor :first_move
 
   def initialize(board,color)
     super(board,color)
     @first_move = true
   end
-
-  attr_accessor :first_move
 
   def moves
     move_list = super(DELTAS)

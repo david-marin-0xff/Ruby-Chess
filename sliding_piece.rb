@@ -1,5 +1,3 @@
-#require_relative 'Piece'
-
 class SlidingPiece < Piece
 
   DELTAS = {
@@ -11,7 +9,7 @@ class SlidingPiece < Piece
     moves = []
     deltas.each do |delta|
       new_pos = [@pos.first + delta.first, @pos.last + delta.last]
-      
+
       while new_pos.first.between?(0,7) && new_pos.last.between?(0,7)
         if @board[new_pos].nil?
           moves << new_pos

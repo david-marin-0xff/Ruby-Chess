@@ -1,5 +1,3 @@
-#require_relative 'Board'
-
 class Piece
   attr_reader :color
   attr_accessor :pos, :board

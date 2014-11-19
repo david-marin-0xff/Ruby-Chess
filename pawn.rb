@@ -1,13 +1,11 @@
-#require_relative 'Piece'
-
 class Pawn < Piece
+
+  attr_accessor :first_move, :en_passant
 
   def initialize(board,color)
     super(board,color)
     @first_move = true
   end
-
-  attr_accessor :first_move, :en_passant
 
   def moves
     moves = []
