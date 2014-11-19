@@ -24,7 +24,7 @@ class Game
 
       begin
         @players[turn].play_turn(@board,turn)
-      rescue => e
+      rescue MyChessError => e
         puts "#{e.message}"
         @board.display
         retry
@@ -44,7 +44,7 @@ class HumanPlayer
     coords = input.split(/\s+/)
 
     if coords.length != 2 || coords.any? { |coord| coord !~ /^[a-hA-H]{1}\d{1}$/ }
-      raise "bad input!"
+      raise MyChessError.new("bad input!")
     end
 
     move = HumanPlayer.translate_coords(coords)
@@ -66,4 +66,7 @@ end
 class ComputerPlayer
   def play_turn(board)
   end
+end
+
+class MyChessError < StandardError
 end
