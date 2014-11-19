@@ -29,9 +29,9 @@ class Game
 
     system "clear" or system "cls"
     puts
+    @board.display(:white, :default, :light_white)
 
     until @board.checkmate?(@turn) || @board.stalemate?(@turn)
-      @board.display(:white, :default, :light_white)
 
       begin
         move = @players[@turn].play_turn(@board,@turn)
@@ -51,10 +51,12 @@ class Game
         retry
       end
 
+      locs = HumanPlayer.translate_coords(move.split(/\s+/))
       sleep(0.3)
 
       system "clear" or system "cls"
 
+      @board.display(:white, :default, :light_white, locs)
       puts "#{@turn.to_s.capitalize}\'s move was #{move.chop}."
 
       @turn = (@turn == :white) ? :black : :white
@@ -163,6 +165,12 @@ class ComputerPlayer
 
     board.move(best_move[0],best_move[1],color)
     ComputerPlayer.translate_coords(best_move)
+    check_promotion(board, color)
+  end
+
+  def check_promotion(board, color)
+    if board.pawn_promotion
+    board.promote_pawn(Queen, color)
   end
 
   def self.translate_coords(coords)

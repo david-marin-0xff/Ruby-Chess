@@ -97,7 +97,7 @@ class Board
     piece.pos = pos unless piece.nil?
   end
 
-  def display(bg1, bg2, border)
+  def display(bg1, bg2, border, move = [])
     top_bot_border = "    A  B  C  D  E  F  G  H    "
                      .colorize(:background => border)
     puts top_bot_border
@@ -107,11 +107,13 @@ class Board
     @grid.each_with_index do |row, idx|
       print " #{8 - idx} ".colorize(:background => border)
 
-      row.each do |space|
+      row.each_with_index do |space, space_idx|
+        back = move.include?([idx, space_idx]) ? :light_red : color
+
         if space.nil?
-          print "   ".colorize(:background => color)
+          print "   ".colorize(:background => back)
         else
-          print " #{space.render} ".colorize(:background => color)
+          print " #{space.render} ".colorize(:background => back)
         end
         color = color == bg1 ? bg2 : bg1
       end
