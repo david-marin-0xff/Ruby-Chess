@@ -203,7 +203,7 @@ end
 if __FILE__ == $PROGRAM_NAME
 
   if ARGV.count == 0
-    g = Game.new(HumanPlayer.new, HumanPlayer.new)
+    g = Game.new(HumanPlayer.new, ComputerPlayer.new)
     g.play
   else
     fname = ARGV.shift
