@@ -51,12 +51,17 @@ class Game
         retry
       end
 
+      sleep(0.3)
+
       system "clear" or system "cls"
+
       puts "#{@turn.to_s.capitalize}\'s move was #{move.chop}."
 
       @turn = (@turn == :white) ? :black : :white
 
-      puts "Check!" if @board.in_check?(@turn)
+      puts "Check!\a" if @board.in_check?(@turn)
+
+
     end
 
     @board.display(:white, :default, :light_white)
