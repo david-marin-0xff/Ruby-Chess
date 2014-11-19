@@ -38,7 +38,7 @@ end
 
 class HumanPlayer
   def play_turn(board,color)
-    puts "Input your move."
+    puts "#{color.to_s.capitalize} to move.  Input your move."
     input = gets.chomp
 
     coords = input.split(/\s+/)
