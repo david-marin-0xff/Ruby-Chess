@@ -10,6 +10,8 @@ class Board
     end
   end
 
+  attr_accessor :en_passant
+
   def pieces(color)
     @grid.flatten.compact.select do |piece|
       piece.color == color
@@ -52,12 +54,20 @@ class Board
   def move!(start_pos, end_pos)
     raise MyChessError.new("no piece @ start_pos") if self[start_pos].nil?
 
-    # unless self[end_pos].nil?
-    #   color = self[end_pos].color
-    # end
-
     if self[start_pos].is_a?(Pawn)
       self[start_pos].first_move = false
+      if (start_pos.first - end_pos.first).abs == 2
+        direction = (end_pos.first - start_pos.first) / 2
+        @en_passant = [start_pos.first + direction, end_pos.last]
+        @en_passant_pawn = end_pos
+      elsif end_pos == @en_passant
+        self[@en_passant_pawn] = nil
+        @en_passant = nil
+      else
+        @en_passant = nil
+      end
+    else
+      @en_passant = nil
     end
 
     self[end_pos] = self[start_pos]

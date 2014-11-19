@@ -7,7 +7,7 @@ class Pawn < Piece
     @first_move = true
   end
 
-  attr_accessor :first_move
+  attr_accessor :first_move, :en_passant
 
   def moves
     moves = []
@@ -23,11 +23,14 @@ class Pawn < Piece
 
     # captures
     new_pos = [pos.first + direction, pos.last + 1]
-    moves << new_pos if !@board[new_pos].nil? && @board[new_pos].color != color
+    moves << new_pos if (!@board[new_pos].nil? &&
+              @board[new_pos].color != color) ||
+              @board.en_passant == new_pos
 
     new_pos = [pos.first + direction, pos.last - 1]
-    moves << new_pos if !@board[new_pos].nil? && @board[new_pos].color != color
-
+    moves << new_pos if (!@board[new_pos].nil? &&
+              @board[new_pos].color != color) ||
+              @board.en_passant == new_pos
     moves
   end
 
