@@ -52,8 +52,12 @@ class Board
   def move!(start_pos, end_pos)
     raise MyChessError.new("no piece @ start_pos") if self[start_pos].nil?
 
-    unless self[end_pos].nil?
-      color = self[end_pos].color
+    # unless self[end_pos].nil?
+    #   color = self[end_pos].color
+    # end
+
+    if self[start_pos].is_a?(Pawn)
+      self[start_pos].first_move = false
     end
 
     self[end_pos] = self[start_pos]
