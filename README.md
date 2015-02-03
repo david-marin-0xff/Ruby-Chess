@@ -4,13 +4,15 @@ This is Chess, playable from the terminal, implemented in Ruby. To play against 
 
 To see human versus human, load chess.rb in irb or pry, and do Game.new(HumanPlayer.new,HumanPlayer.new).play
 
+Note that since the pieces are represented using unicode characters, your terminal needs to be using a font that supports them for the pieces to display correctly. Also, the colorize gem is used for some board markup, so make sure it is installed.
+
 Highlights
 ======
 The most complex logic is in the special rules.
 
 The possibility of En Passant is tracked by the board object, with instance variables for the position that a pawn could move to with En Passant, and the Pawn object that would be captured by such a move. Whenever a pawn is scanning for legal moves, it compares a potential diagonal move to the board's en passant move.
 
-With Castling, if the king has not yet moved, it scans all of the conditions for castling (Rook hasn't moved, no pieces between King and Rook, King doesn't move through an attacked space), and allows the move if they are met.
+Castling is relatively straightforward, if the king has not yet moved, it scans all of the conditions for castling (Rook hasn't moved, no pieces between King and Rook, King doesn't move through an attacked space), and allows the move if they are met.
 
 To determine whether a move would be self-check, we create a duplicate of the board object, make the move, and look for attacks on the King.
 
