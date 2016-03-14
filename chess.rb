@@ -19,33 +19,35 @@ PROMOTIONS = {
 }
 
 class Game
+  attr_accessor :board, :players, :turn
+
   def initialize(player1, player2)
-    @board = Board.new
-    @players = {:white => player1, :black => player2}
-    @turn = :white
+    self.board = Board.new
+    self.players = {:white => player1, :black => player2}
+    self.turn = :white
   end
 
   def play
 
     system "clear" or system "cls"
     puts
-    @board.display
+    board.display
 
-    until @board.checkmate?(@turn) || @board.stalemate?(@turn)
+    until board.checkmate?(turn) || board.stalemate?(turn)
       move = do_move
       sleep(0.3)
       show_move(move)
 
-      @turn = (@turn == :white) ? :black : :white
-      puts "Check!\a" if @board.in_check?(@turn)
+      self.turn = (turn == :white) ? :black : :white
+      puts "Check!\a" if board.in_check?(turn)
     end
 
-    @board.display
+    board.display
 
-    if @board.checkmate?(@turn)
-      winner = (@turn == :white) ? :black : :white
+    if board.checkmate?(turn)
+      winner = (turn == :white) ? :black : :white
       puts "Checkmate! The winner is #{winner}."
-    elsif @board.stalemate?(@turn)
+    elsif board.stalemate?(turn)
       puts "The game is a draw."
     end
   end
@@ -64,13 +66,13 @@ class Game
   def show_move(move)
     locs = HumanPlayer.translate_coords(move.split(/\s+/))
     system "clear" or system "cls"
-    @board.display(locs)
-    puts "#{@turn.to_s.capitalize}\'s move was #{move.chomp(' ')}."
+    board.display(locs)
+    puts "#{turn.to_s.capitalize}\'s move was #{move.chomp(' ')}."
   end
 
   def do_move
     begin
-      move = @players[@turn].play_turn(@board,@turn)
+      move = players[turn].play_turn(board,turn)
       if move == "save"
         save_game
         return
@@ -78,7 +80,7 @@ class Game
     rescue MyChessError => e
       system "clear" or system "cls"
       puts "#{e.message}"
-      @board.display
+      board.display
       retry
     end
     move
