@@ -10,15 +10,15 @@ class Board
 
   def initialize(grid = nil)
     if grid.nil?
-      @grid = Array.new(8) { Array.new(8) }
+      self.grid = Array.new(8) { Array.new(8) }
       setup_pieces
     else
-      @grid = grid
+      self.grid = grid
     end
   end
 
   def pieces(color)
-    @grid.flatten.compact.select { |piece| piece.color == color }
+    grid.flatten.compact.select { |piece| piece.color == color }
   end
 
   def in_check?(color)
@@ -43,7 +43,7 @@ class Board
   end
 
   def inspect
-    @grid
+    grid
   end
 
   def move(start_pos,end_pos, color)
@@ -68,8 +68,8 @@ class Board
 
     grid_copy.each_index do |row|
       grid_copy[row].each_index do |col|
-        next if @grid[row][col].nil?
-        piece = @grid[row][col]
+        next if grid[row][col].nil?
+        piece = grid[row][col]
         board_copy[[row,col]] = piece.class.new(board_copy, piece.color)
       end
     end
@@ -78,11 +78,11 @@ class Board
   end
 
   def [](pos)
-    @grid[pos.first][pos.last]
+    grid[pos.first][pos.last]
   end
 
   def []=(pos,piece)
-    @grid[pos.first][pos.last] = piece
+    grid[pos.first][pos.last] = piece
     piece.pos = pos unless piece.nil?
   end
 
@@ -97,7 +97,7 @@ class Board
 
     color = bg1
 
-    @grid.each_with_index do |row, idx|
+    grid.each_with_index do |row, idx|
       print " #{8 - idx} ".colorize(:background => border)
 
       row.each_with_index do |space, space_idx|
@@ -120,11 +120,12 @@ class Board
 
   def promote_pawn(piece, color)
     raise MyChessError.new("Bad piece!") unless PROMOTIONS.has_key?(piece)
-    self[@pawn_promotion] = PROMOTIONS[piece].new(self, color)
-    @pawn_promotion = nil
+    self[pawn_promotion] = PROMOTIONS[piece].new(self, color)
+    pawn_promotion = nil
   end
 
   private
+  attr_accessor :grid, :en_passant_pawn
 
   def validate_move(start_pos, end_pos, color)
     raise MyChessError.new("No piece @ start position!") if self[start_pos].nil?
@@ -175,18 +176,18 @@ class Board
 
       if (start_pos.first - end_pos.first).abs == 2
         direction = (end_pos.first - start_pos.first) / 2
-        @en_passant = [start_pos.first + direction, end_pos.last]
-        @en_passant_pawn = end_pos
-      elsif end_pos == @en_passant
-        self[@en_passant_pawn] = nil
-        @en_passant = nil
+        en_passant = [start_pos.first + direction, end_pos.last]
+        en_passant_pawn = end_pos
+      elsif end_pos == en_passant
+        self[en_passant_pawn] = nil
+        en_passant = nil
       else
-        @en_passant = nil
-        @pawn_promotion = end_pos if end_pos.first == 0 || end_pos.first == 7
+        en_passant = nil
+        pawn_promotion = end_pos if end_pos.first == 0 || end_pos.first == 7
       end
-      
+
     else
-      @en_passant = nil
+      en_passant = nil
     end
   end
 

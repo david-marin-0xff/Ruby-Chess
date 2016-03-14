@@ -3,9 +3,9 @@ class Piece
   attr_accessor :pos, :board
 
   def initialize(board,color)
-    @pos = nil
-    @board = board
-    @color = color
+    self.pos = nil
+    self.board = board
+    self.color = color
   end
 
   def inspect
@@ -28,4 +28,7 @@ class Piece
 
   def render
   end
+  
+  private
+  attr_writer :color
 end

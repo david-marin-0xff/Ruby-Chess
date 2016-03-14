@@ -7,7 +7,7 @@ class King < SteppingPiece
 
   def initialize(board,color)
     super(board,color)
-    @first_move = true
+    self.first_move = true
   end
 
   def moves
@@ -15,28 +15,28 @@ class King < SteppingPiece
 
     return move_list unless self.first_move
 
-    return move_list if @board.in_check?(@color)
+    return move_list if board.in_check?(@color)
 
     # Kingside
-    kingside_rook = @board[[pos.first, pos.last + 3]]
+    kingside_rook = board[[pos.first, pos.last + 3]]
 
     if kingside_rook.first_move
       positions = [[pos.first, pos.last + 1], [pos.first, pos.last+2]]
 
-      if positions.all? { |loc| @board[loc].nil? && !move_into_check?(loc) }
+      if positions.all? { |loc| board[loc].nil? && !move_into_check?(loc) }
         move_list << positions.last
       end
     end
 
     # Queenside
-    queenside_rook = @board[[pos.first, pos.last - 4]]
+    queenside_rook = board[[pos.first, pos.last - 4]]
 
     if queenside_rook.first_move
       positions = [[pos.first, pos.last - 1 ],
                   [pos.first, pos.last - 2]]
       b_square = [pos.first, pos.last - 3]
-      if @board[b_square].nil? &&
-        positions.all? { |loc| @board[loc].nil? && !move_into_check?(loc) }
+      if board[b_square].nil? &&
+        positions.all? { |loc| board[loc].nil? && !move_into_check?(loc) }
         move_list << positions.last
       end
     end

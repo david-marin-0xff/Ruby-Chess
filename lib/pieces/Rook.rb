@@ -4,7 +4,7 @@ class Rook < SlidingPiece
 
   def initialize(board,color)
     super(board,color)
-    @first_move = true
+    self.first_move = true
   end
 
   def moves

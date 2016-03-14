@@ -19,8 +19,6 @@ PROMOTIONS = {
 }
 
 class Game
-  attr_accessor :board, :players, :turn
-
   def initialize(player1, player2)
     self.board = Board.new
     self.players = {:white => player1, :black => player2}
@@ -53,6 +51,7 @@ class Game
   end
 
   private
+  attr_accessor :board, :players, :turn
 
   def save_game
     puts "Please enter filename:"
