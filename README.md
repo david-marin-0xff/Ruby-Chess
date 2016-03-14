@@ -1,5 +1,6 @@
 Chess
 =======
+![Chess](https://garrettjohnson.net/images/thumbs/chessthumb.png)
 This is Chess, playable from the terminal, implemented in Ruby. To play against the computer, simply run chess.rb.
 
 To see human versus human, load chess.rb in irb or pry, and do Game.new(HumanPlayer.new,HumanPlayer.new).play
