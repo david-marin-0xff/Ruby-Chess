@@ -1,4 +1,4 @@
-Description
+Chess
 =======
 This is Chess, playable from the terminal, implemented in Ruby. To play against the computer, simply run chess.rb.
 
