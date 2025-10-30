@@ -1,26 +1,67 @@
-Chess
-=======
-![Chess](http://www.garrettjohnson.net/images/fulls/chessfull.png)
-This is Chess, playable from the terminal, implemented in Ruby. To play against the computer, simply run chess.rb.
+# ♟️ Ruby-Chess ♟️
 
-To see human versus human, load chess.rb in irb or pry, and do Game.new(HumanPlayer.new,HumanPlayer.new).play
+A simple terminal-based chess game written in **Ruby**.
 
-Note that since the pieces are represented using unicode characters, your terminal needs to be using a font that supports them for the pieces to display correctly. Also, the colorize gem is used for some board markup, so make sure it is installed.
+This project is a **fork** of an earlier open-source Ruby chess implementation.  
+I’ve updated it with **improved visuals, simplified color handling**, and a **clearer introduction for players**.
 
-Highlights
-======
-The most complex logic is in the special rules.
+---
 
-The possibility of En Passant is tracked by the board object, with instance variables for the position that a pawn could move to with En Passant, and the Pawn object that would be captured by such a move. Whenever a pawn is scanning for legal moves, it compares a potential diagonal move to the board's en passant move.
+## Features
 
-Castling is relatively straightforward, if the king has not yet moved, it scans all of the conditions for castling (Rook hasn't moved, no pieces between King and Rook, King doesn't move through an attacked space), and allows the move if they are met.
+- Fully functional chess rules (check, checkmate, stalemate, promotion)
+- Play against a basic computer opponent
+- ASCII-based board with Unicode chess pieces
+- Simple and clean color scheme for easy readability
+- Save and load games using YAML
 
-To determine whether a move would be self-check, we create a duplicate of the board object, make the move, and look for attacks on the King.
+---
 
-Future Features
-==========
-Allow the use of Chess Notation for move inputs.
+## How to Play
 
-An all-around nicer interface.
+### 1️⃣ Install Ruby  
+Make sure you have Ruby installed. You can check with:
+    ruby -v
 
-Better AI!
+If you don’t have it, install it from:
+    https://www.ruby-lang.org/en/downloads/
+
+---
+
+### 2️⃣ Run the Game
+Clone the repository and start the game:
+    git clone https://github.com/david-marin-0xff/Ruby-Chess.git
+    cd Ruby-Chess
+    ruby chess.rb
+
+---
+
+### 3️⃣ Move Pieces
+Moves are entered in standard chess notation, for example:
+    e2 e4
+    g8 f6
+
+You can type:
+    save
+at any time to save your current game.
+
+---
+
+## Notes
+
+This is a **learning and experimental fork**, created to explore Ruby, game logic, and terminal graphics.  
+It’s also a fun weekend project — not meant for competitive play, but to study how a chess engine and move validation work under the hood.
+
+---
+
+## Credits
+
+Original project by another open-source contributor. → https://github.com/reruns/chess 
+Forked, modified, and maintained by:
+    David Marín (https://github.com/david-marin-0xff)
+
+---
+
+## License
+
+MIT License — free to use, modify, and share.
