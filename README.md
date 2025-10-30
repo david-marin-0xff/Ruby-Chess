@@ -26,6 +26,9 @@ Make sure you have Ruby installed. You can check with:
 If you don’t have it, install it from:
     https://www.ruby-lang.org/en/downloads/
 
+<img width="922" height="365" alt="image" src="https://github.com/user-attachments/assets/afce8ddc-78db-4642-880b-402b073c10c0" />
+
+
 ---
 
 ### 2️⃣ Run the Game
