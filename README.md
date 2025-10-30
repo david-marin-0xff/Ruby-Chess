@@ -34,6 +34,9 @@ Clone the repository and start the game:
     cd Ruby-Chess
     ruby chess.rb
 
+    <img width="1036" height="408" alt="image" src="https://github.com/user-attachments/assets/8020cfbf-7372-4862-b9db-4d9e247cef33" />
+
+
 ---
 
 ### 3️⃣ Move Pieces
@@ -44,6 +47,9 @@ Moves are entered in standard chess notation, for example:
 You can type:
     save
 at any time to save your current game.
+
+<img width="822" height="535" alt="image" src="https://github.com/user-attachments/assets/70ec0d34-3692-4fec-a4f6-1185184d6d55" />
+
 
 ---
 
