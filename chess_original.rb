@@ -1,4 +1,3 @@
-# --- Load dependencies FIRST ---
 require_relative 'lib/board'
 require_relative 'lib/piece'
 require_relative 'lib/stepping_piece'
@@ -9,8 +8,8 @@ require_relative 'lib/pieces/rook'
 require_relative 'lib/pieces/bishop'
 require_relative 'lib/pieces/knight'
 require_relative 'lib/pieces/pawn'
-require 'colorize'
-require 'yaml'
+require          'colorize'
+require          'yaml'
 
 PROMOTIONS = {
   "queen"  => Queen,
@@ -22,21 +21,21 @@ PROMOTIONS = {
 class Game
   def initialize(player1, player2)
     self.board = Board.new
-    self.players = { :white => player1, :black => player2 }
+    self.players = {:white => player1, :black => player2}
     self.turn = :white
   end
 
   def play
+
     system "clear" or system "cls"
     puts
-    show_instructions
-    sleep(1.5)
     board.display
 
     until board.checkmate?(turn) || board.stalemate?(turn)
       move = do_move
       sleep(0.3)
       show_move(move)
+
       self.turn = (turn == :white) ? :black : :white
       puts "Check!\a" if board.in_check?(turn)
     end
@@ -52,26 +51,14 @@ class Game
   end
 
   private
-
   attr_accessor :board, :players, :turn
-
-  def show_instructions
-    # Banner removed here (displayed by launcher) to avoid duplication
-    puts
-    puts "How to play:"
-    puts "- You play as White; the computer plays as Black."
-    puts "- To move a piece, type its start and end squares (e.g., 'e2 e4')."
-    puts "- Type 'save' to save the game to a file."
-    puts "- Standard chess rules apply (check, checkmate, promotion, etc.)."
-    puts
-    puts "Press ENTER to start..."
-    gets
-  end
 
   def save_game
     puts "Please enter filename:"
     fname = gets.chomp
-    File.open(fname, 'w') { |f| f.puts self.to_yaml }
+    File.open(fname, 'w') do |f|
+      f.puts self.to_yaml
+    end
     puts "Game saved to file: \"#{fname}\"."
   end
 
@@ -79,12 +66,12 @@ class Game
     locs = HumanPlayer.translate_coords(move.split(/\s+/))
     system "clear" or system "cls"
     board.display(locs)
-    puts "#{turn.to_s.capitalize}'s move was #{move.chomp(' ')}."
+    puts "#{turn.to_s.capitalize}\'s move was #{move.chomp(' ')}."
   end
 
   def do_move
     begin
-      move = players[turn].play_turn(board, turn)
+      move = players[turn].play_turn(board,turn)
       if move == "save"
         save_game
         return
@@ -97,31 +84,37 @@ class Game
     end
     move
   end
+
 end
 
 class HumanPlayer
+
   def play_turn(board, color)
     puts "#{color.to_s.capitalize} to move.  Input your move."
     input = gets.chomp
+
     return "save" if input.downcase == "save"
 
     coords = input.split(/\s+/)
+
     if coords.length != 2 || coords.any? { |coord| coord !~ /^[a-hA-H]{1}\d{1}$/ }
-      raise MyChessError.new("Bad input! Example: 'e2 e4'")
+      raise MyChessError.new("Bad input!")
     end
 
     move = HumanPlayer.translate_coords(coords)
-    board.move(move[0], move[1], color)
+    board.move(move[0],move[1],color)
     check_promotion(board, color)
     input
   end
 
   def self.translate_coords(coords)
-    coords.map do |coord|
-      row = 8 - coord[1].to_i
-      col = coord[0].downcase.ord - 97
-      [row, col]
+    new_coords = []
+    coords.each do |coord|
+      new_coords_one = coord[0].downcase.bytes[0] - 97
+      new_coords_two = 8 - coord[1].to_i
+      new_coords << [new_coords_two, new_coords_one]
     end
+    new_coords
   end
 
   private
@@ -129,7 +122,7 @@ class HumanPlayer
   def check_promotion(board, color)
     if board.pawn_promotion
       begin
-        puts "What piece would you like to promote to? (queen, rook, bishop, knight)"
+        puts "What piece would you like to promote to?"
         piece = gets.chomp.downcase
         board.promote_pawn(piece, color)
       rescue MyChessError => e
@@ -142,48 +135,58 @@ class HumanPlayer
 end
 
 class ComputerPlayer
-  PIECE_VALUES = {
-    Queen => 9,
-    Rook => 5,
-    Knight => 3,
-    Bishop => 3,
-    Pawn => 1
-  }
+
+  PIECE_VALUES = { Queen => 9,
+                   Rook => 5,
+                   Knight => 3,
+                   Bishop => 3,
+                   Pawn => 1}
 
   def play_turn(board, color)
     best_move = []
     best_val = 0
+
     our_pieces = board.pieces(color)
     enemy_pieces = board.pieces(color == :black ? :white : :black)
-    enemy_positions = enemy_pieces.map(&:pos)
+
+    enemy_positions = enemy_pieces.map { |piece| piece.pos }
 
     our_pieces.each do |piece|
       piece_moves = piece.valid_moves
+
       cap_moves = piece_moves.select { |move| enemy_positions.include?(move) }
       next if cap_moves.empty?
       best = cap_moves.max_by { |move| PIECE_VALUES[board[move].class] }
       val = PIECE_VALUES[board[best].class]
       if val > best_val
-        best_move = [piece.pos, best]
+        best_move = [piece.pos,best]
         best_val = val
       end
     end
 
     if best_val.zero?
-      piece = our_pieces.reject { |p| p.valid_moves.empty? }.sample
+      piece = our_pieces.reject do |piece|
+        piece.valid_moves.count.zero?
+      end.sample
+
       move = piece.valid_moves.sample
-      best_move = [piece.pos, move]
+      best_move = [piece.pos,move]
     end
 
-    board.move(best_move[0], best_move[1], color)
+
+    board.move(best_move[0],best_move[1],color)
     check_promotion(board, color)
     ComputerPlayer.translate_coords(best_move)
   end
 
   def self.translate_coords(coords)
-    coords.map do |coord|
-      "#{(coord[1] + 97).chr}#{8 - coord[0]}"
-    end.join(" ")
+    new_coords = ""
+    coords.each do |coord|
+      new_coords_one = (coord[1] + 97).chr
+      new_coords_two = (8 - coord[0]).to_s
+      new_coords << new_coords_one << new_coords_two << " "
+    end
+    new_coords
   end
 
   private
@@ -191,25 +194,22 @@ class ComputerPlayer
   def check_promotion(board, color)
     board.promote_pawn(Queen, color) if board.pawn_promotion
   end
+
 end
 
-class MyChessError < StandardError; end
+class MyChessError < StandardError
 
-# --- Start section: launcher ---
+end
+
 if __FILE__ == $PROGRAM_NAME
-  puts "RubyChess v0.1 (Forked by david-marin-0xff)"
-  puts "-------------------------------------------"
-  sleep(0.8)
-
-  system "clear" or system "cls"
 
   if ARGV.count == 0
     g = Game.new(HumanPlayer.new, ComputerPlayer.new)
     g.play
   else
     fname = ARGV.shift
-    g = YAML.load(File.read(fname))
+    g = YAML::load(File.read(fname))
     g.play
   end
+
 end
-# --- End section ---

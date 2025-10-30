@@ -1,14 +1,32 @@
+# lib/board.rb
+
 class Board
-  COLORS = {
-    :light => :default,
-    :dark => :white,
-    :border => :light_white,
-    :highlight => :light_red
+  THEMES = {
+    "classic" => {
+      :light => :light_black,
+      :dark => :black,
+      :border => :light_white,
+      :highlight => :yellow
+    },
+    "bluesteel" => {
+      :light => :light_blue,
+      :dark => :blue,
+      :border => :light_white,
+      :highlight => :light_cyan
+    },
+    "greenfield" => {
+      :light => :light_green,
+      :dark => :green,
+      :border => :light_white,
+      :highlight => :light_yellow
+    }
   }
 
-  attr_accessor :en_passant, :pawn_promotion
+  attr_accessor :en_passant, :pawn_promotion, :theme
 
-  def initialize(grid = nil)
+  def initialize(grid = nil, theme_name = "classic")
+    @theme = THEMES[theme_name] || THEMES["classic"]
+
     if grid.nil?
       self.grid = Array.new(8) { Array.new(8) }
       setup_pieces
@@ -23,9 +41,7 @@ class Board
 
   def in_check?(color)
     enemy_color = color == :black ? :white : :black
-
     our_king_pos = pieces(color).select { |piece| piece.is_a?(King) }[0].pos
-
     pieces(enemy_color).any? do |piece|
       next if piece.is_a?(King)
       piece.moves.include?(our_king_pos)
@@ -37,40 +53,35 @@ class Board
   end
 
   def stalemate?(color)
-    !in_check?(color) && pieces(color).all? do |piece|
-      piece.valid_moves.empty?
-    end
+    !in_check?(color) && pieces(color).all? { |piece| piece.valid_moves.empty? }
   end
 
   def inspect
     grid
   end
 
-  def move(start_pos,end_pos, color)
-    validate_move(start_pos,end_pos, color)
-
+  def move(start_pos, end_pos, color)
+    validate_move(start_pos, end_pos, color)
     self.move!(start_pos, end_pos)
   end
 
   def move!(start_pos, end_pos)
     self[start_pos].first_move = false if self[start_pos].is_a?(Rook)
-
     check_king(start_pos, end_pos)
     check_pawn(start_pos, end_pos)
-
     self[end_pos] = self[start_pos]
     self[start_pos] = nil
   end
 
   def dup
-    grid_copy = Array.new(8) {Array.new(8)}
-    board_copy = Board.new(grid_copy)
+    grid_copy = Array.new(8) { Array.new(8) }
+    board_copy = Board.new(grid_copy, "classic")
 
     grid_copy.each_index do |row|
       grid_copy[row].each_index do |col|
         next if grid[row][col].nil?
         piece = grid[row][col]
-        board_copy[[row,col]] = piece.class.new(board_copy, piece.color)
+        board_copy[[row, col]] = piece.class.new(board_copy, piece.color)
       end
     end
 
@@ -81,39 +92,43 @@ class Board
     grid[pos.first][pos.last]
   end
 
-  def []=(pos,piece)
+  def []=(pos, piece)
     grid[pos.first][pos.last] = piece
     piece.pos = pos unless piece.nil?
   end
 
   def display(move = [])
-    bg1 = COLORS[:dark]
-    bg2 = COLORS[:light]
-    border = COLORS[:border]
+    bg1 = theme[:dark]
+    bg2 = theme[:light]
+    border = theme[:border]
 
     top_bot_border = "    A  B  C  D  E  F  G  H    "
-                     .colorize(:background => border)
+                     .colorize(:color => :black, :background => border)
     puts top_bot_border
 
     color = bg1
 
     grid.each_with_index do |row, idx|
-      print " #{8 - idx} ".colorize(:background => border)
+      print " #{8 - idx} ".colorize(:color => :black, :background => border)
 
       row.each_with_index do |space, space_idx|
-        back = move.include?([idx, space_idx]) ? COLORS[:highlight] : color
+        back = move.include?([idx, space_idx]) ? theme[:highlight] : color
 
         if space.nil?
           print "   ".colorize(:background => back)
         else
-          print " #{space.render} ".colorize(:background => back)
+          fg = space.color == :white ? :light_white : :light_cyan
+          print " #{space.render} ".colorize(:color => fg, :background => back)
         end
-        color = color == bg1 ? bg2 : bg1
+
+        color = (color == bg1) ? bg2 : bg1
       end
-      color = color == bg1 ? bg2 : bg1
-      print " #{8 - idx} ".colorize(:background => border)
+
+      color = (color == bg1) ? bg2 : bg1
+      print " #{8 - idx} ".colorize(:color => :black, :background => border)
       puts
     end
+
     puts top_bot_border
     nil
   end
@@ -125,14 +140,13 @@ class Board
   end
 
   private
+
   attr_accessor :grid, :en_passant_pawn
 
   def validate_move(start_pos, end_pos, color)
     raise MyChessError.new("No piece @ start position!") if self[start_pos].nil?
-    raise MyChessError.new("Piece can't move there!") unless self[start_pos]
-          .moves.include?(end_pos)
-    raise MyChessError.new("Causes check!") unless self[start_pos]
-          .valid_moves.include?(end_pos)
+    raise MyChessError.new("Piece can't move there!") unless self[start_pos].moves.include?(end_pos)
+    raise MyChessError.new("Causes check!") unless self[start_pos].valid_moves.include?(end_pos)
     raise MyChessError.new("Wrong turn!") unless self[start_pos].color == color
   end
 
@@ -147,8 +161,7 @@ class Board
   end
 
   def setup_nonpawn(row, color)
-    nonpawn_row = [Rook, Knight, Bishop,
-      Queen, King, Bishop, Knight, Rook]
+    nonpawn_row = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook]
     nonpawn_row.each_with_index do |piece_class, i|
       self[[row, i]] = piece_class.new(self, color)
     end
@@ -190,5 +203,4 @@ class Board
       en_passant = nil
     end
   end
-
 end
