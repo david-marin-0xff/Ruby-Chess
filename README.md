@@ -22,12 +22,12 @@ I’ve updated it with **improved visuals, simplified color handling**, and a **
 ### 1️⃣ Install Ruby  
 Make sure you have Ruby installed. You can check with:
 
-    **ruby -v**
+    ruby -v
 
 If you don’t have it, install it from:
     https://www.ruby-lang.org/en/downloads/
 
-<img width="922" height="365" alt="image" src="https://github.com/user-attachments/assets/afce8ddc-78db-4642-880b-402b073c10c0" />
+
 
 
 ---
@@ -41,7 +41,7 @@ Clone the repository and start the game:
     
     **ruby chess.rb**
 
-    <img width="1036" height="408" alt="image" src="https://github.com/user-attachments/assets/8020cfbf-7372-4862-b9db-4d9e247cef33" />
+<img width="922" height="365" alt="image" src="https://github.com/user-attachments/assets/afce8ddc-78db-4642-880b-402b073c10c0" />
 
 
 ---
