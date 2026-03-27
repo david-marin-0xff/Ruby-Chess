@@ -35,11 +35,11 @@ If you don’t have it, install it from:
 ### 2️⃣ Run the Game
 Clone the repository and start the game:
 
-    **git clone https://github.com/david-marin-0xff/Ruby-Chess.git**
+    git clone https://github.com/david-marin-0xff/Ruby-Chess.git
     
-    **cd Ruby-Chess**
+    cd Ruby-Chess
     
-    **ruby chess.rb**
+    ruby chess.rb
 
 <img width="922" height="365" alt="image" src="https://github.com/user-attachments/assets/afce8ddc-78db-4642-880b-402b073c10c0" />
 
@@ -65,7 +65,7 @@ at any time to save your current game.
 This is a **learning and experimental fork**, created to explore Ruby, game logic, and terminal graphics.  
 It’s also a fun weekend project — not meant for competitive play, but to study how a chess engine and move validation work under the hood.
 
-Learn how the “AI opponent” works: 
+Learn how the “AI opponent” works:  https://github.com/david-marin-0xff/Ruby-Chess/blob/master/Opponent-logic.md 
 
 ---
 
